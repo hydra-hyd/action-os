@@ -1,0 +1,11 @@
+{
+  "name": "ACTION OS",
+  "short_name": "ACTION OS",
+  "description": "タスクを実行できる人間になるためのアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#059669",
+  "lang": "ja",
+  "icons": [{ "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }]
+}

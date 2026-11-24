@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    "Hiragino Sans",
+    "Yu Gothic UI",
+    "Meiryo",
+    sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
