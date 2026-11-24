@@ -37,6 +37,8 @@ const blank = (): Draft => ({
   firstAction: "",
   goals: { minimum: "", normal: "", stretch: "" },
   steps: [],
+  goalId: null,
+  milestoneId: null,
   isMostImportant: false,
 });
 
@@ -203,9 +205,27 @@ export default function TasksPage() {
                 <input type="number" min={1} className={inputClass} value={draft.estimateMin ?? ""} onChange={(e) => setDraft({ ...draft, estimateMin: e.target.value ? Number(e.target.value) : null })} />
               </Field>
             </div>
-            <Field label="カテゴリー">
-              <input className={inputClass} value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} placeholder="学業・健康・キャリアなど" />
-            </Field>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <Field label="カテゴリー">
+                <input className={inputClass} value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} placeholder="学業・健康・キャリアなど" />
+              </Field>
+              <Field label="関連する目標">
+                <select className={inputClass} value={draft.goalId ?? ""} onChange={(e) => setDraft({ ...draft, goalId: e.target.value || null, milestoneId: null })}>
+                  <option value="">なし</option>
+                  {s.goals.filter((g) => g.status !== "withdrawn").map((g) => (
+                    <option key={g.id} value={g.id}>{g.title}</option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="マイルストーン">
+                <select className={inputClass} value={draft.milestoneId ?? ""} onChange={(e) => setDraft({ ...draft, milestoneId: e.target.value || null })} disabled={!draft.goalId}>
+                  <option value="">なし</option>
+                  {s.milestones.filter((m) => m.goalId === draft.goalId).map((m) => (
+                    <option key={m.id} value={m.id}>{m.title}</option>
+                  ))}
+                </select>
+              </Field>
+            </div>
             <details className="rounded-xl bg-zinc-50 p-3 dark:bg-zinc-800/50">
               <summary className="cursor-pointer text-sm font-medium">優先度の評価（0〜100）</summary>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -240,6 +260,7 @@ export default function TasksPage() {
               <TaskRow
                 t={t}
                 score={Math.round(priorityScore(t, s.settings.weights))}
+                goalTitle={t.goalId ? s.goals.find((g) => g.id === t.goalId)?.title : undefined}
                 onStart={() => {
                   dispatch((st) => startTask(st, t.id));
                   router.push("/focus");
@@ -271,6 +292,7 @@ export default function TasksPage() {
 function TaskRow(props: {
   t: Task;
   score: number;
+  goalTitle?: string;
   onStart: () => void;
   onEdit: () => void;
   onDuplicate: () => void;
@@ -304,6 +326,7 @@ function TaskRow(props: {
           </div>
           <div className="mt-1 text-xs text-zinc-500">
             優先度 {props.score}
+            {props.goalTitle && ` ・ ◎ ${props.goalTitle}`}
             {t.firstAction && ` ・ 最初の行動：${t.firstAction}`}
             {t.deadline && ` ・ 締切 ${new Date(t.deadline).toLocaleString("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" })}`}
           </div>

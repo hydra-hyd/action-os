@@ -23,12 +23,17 @@ const STATUS: { name: string; state: "done" | "partial" | "todo"; note?: string 
   { name: "極小習慣・実行記録", state: "done" },
   { name: "経験値・レベル（冪等付与）", state: "done" },
   { name: "日次・週次・月次の行動分析", state: "done" },
-  { name: "AIタスク分解", state: "partial", note: "ANTHROPIC_API_KEY 設定時のみ。未設定時はルールベース" },
+  { name: "長期目標・階層・価値観の紐付け・マイルストーン・KPI", state: "done" },
+  { name: "逆算計画・戦略比較・WOOP・リスク・プランA/B/C", state: "done", note: "ルールベース（AIではない）。登録は承認制" },
+  { name: "計画と実績の比較・達成予測・計画修正・変更履歴", state: "done", note: "予測は記録された進捗推移からの推定" },
+  { name: "人生ロードマップ・ガントチャート・目標ツリー", state: "partial", note: "ドラッグでの期間変更・クリティカルパス・マインドマップ・カンバン表示は未実装" },
+  { name: "リソース管理・戦略参謀（診断）・定期レビュー", state: "partial", note: "診断はルールベース。AIによる対話的な目標設定・計画生成は未実装" },
+  { name: "AIタスク分解", state: "partial", note: "ANTHROPIC_API_KEY 設定時のみ（公開版は不可）。未設定時はルールベース" },
   { name: "Notion 知識の同期・RAG", state: "todo", note: "Phase 4。テクニック本文は未同期" },
   { name: "ユーザー認証・端末間同期（Supabase）", state: "todo", note: "現在はこの端末のブラウザ内にのみ保存" },
   { name: "オフライン（Service Worker）・Web Push 通知", state: "todo" },
-  { name: "CBT思考記録・ACTワーク・価値観・ジャーナル", state: "todo", note: "Phase 2" },
-  { name: "スキルツリー・クエスト・実績", state: "todo", note: "Phase 3" },
+  { name: "CBT思考記録・ACTワーク・ジャーナル", state: "todo", note: "Phase 2（価値観の登録と目標への紐付けは実装済み）" },
+  { name: "スキルツリー・クエスト・実績", state: "todo", note: "Phase 3（マイルストーン・目標達成のXPは実装済み）" },
 ];
 
 export default function SettingsPage() {
@@ -54,9 +59,10 @@ export default function SettingsPage() {
 
       <Card className="md:hidden">
         <SectionTitle>その他の画面</SectionTitle>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link href="/rules" className="rounded-xl bg-zinc-100 px-4 py-2 text-sm dark:bg-zinc-800">if-then ルール</Link>
           <Link href="/stuck" className="rounded-xl bg-zinc-100 px-4 py-2 text-sm dark:bg-zinc-800">心理支援</Link>
+          <Link href="/analytics" className="rounded-xl bg-zinc-100 px-4 py-2 text-sm dark:bg-zinc-800">行動分析</Link>
         </div>
       </Card>
 

@@ -21,6 +21,16 @@ import { XP_TABLE, awardPsychWorkXp, awardXp } from "./xp";
 export function emptyState(): AppState {
   return {
     version: 1,
+    values: [],
+    goals: [],
+    milestones: [],
+    metrics: [],
+    metricLogs: [],
+    risks: [],
+    strategies: [],
+    planVersions: [],
+    progressLogs: [],
+    reviews: [],
     tasks: [],
     actionLogs: [],
     focusSessions: [],
@@ -30,7 +40,12 @@ export function emptyState(): AppState {
     rules: [],
     ruleLogs: [],
     xpLogs: [],
-    settings: { gamification: true, aiEnabled: false, weights: { ...DEFAULT_WEIGHTS } },
+    settings: {
+      gamification: true,
+      aiEnabled: false,
+      weights: { ...DEFAULT_WEIGHTS },
+      planning: { weeklyAvailableHours: 14, reserveRatio: 0.2, birthYear: null },
+    },
   };
 }
 
@@ -54,6 +69,8 @@ export function newTask(input: TaskInput, now = new Date()): Task {
     goals: { minimum: "", normal: "", stretch: "" },
     steps: [],
     status: "todo",
+    goalId: null,
+    milestoneId: null,
     isMostImportant: false,
     nextAction: "",
     progressNote: "",

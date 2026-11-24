@@ -2,6 +2,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 import { emptyState } from "./domain/actions";
+import { syncAllProgress } from "./domain/goals";
 import type { AppState } from "./domain/types";
 
 /**
@@ -20,10 +21,17 @@ export function loadState(raw: string | null): AppState {
   try {
     const parsed = JSON.parse(raw) as Partial<AppState>;
     if (parsed.version !== 1) return base;
+    // 後方互換マイグレーション：既存データは削除せず、新しい項目に初期値を補う
     return {
       ...base,
       ...parsed,
-      settings: { ...base.settings, ...(parsed.settings ?? {}), weights: { ...base.settings.weights, ...(parsed.settings?.weights ?? {}) } },
+      tasks: (parsed.tasks ?? []).map((t) => ({ ...t, goalId: t.goalId ?? null, milestoneId: t.milestoneId ?? null })),
+      settings: {
+        ...base.settings,
+        ...(parsed.settings ?? {}),
+        weights: { ...base.settings.weights, ...(parsed.settings?.weights ?? {}) },
+        planning: { ...base.settings.planning, ...(parsed.settings?.planning ?? {}) },
+      },
     } as AppState;
   } catch {
     return base;
@@ -64,7 +72,7 @@ function subscribe(cb: () => void) {
 export function useAppState() {
   const s = useSyncExternalStore(subscribe, read, () => SERVER_STATE);
   const dispatch = useCallback((fn: (s: AppState) => AppState) => {
-    setState(fn(read()));
+    setState(syncAllProgress(fn(read())));
   }, []);
   return [s, dispatch] as const;
 }

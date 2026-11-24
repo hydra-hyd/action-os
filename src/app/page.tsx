@@ -7,7 +7,9 @@ import { Badge, Button, Card, ProgressBar, SectionTitle, Stat, inputClass, useNo
 import { activeFocus, addTask, logHabit, startTask } from "@/lib/domain/actions";
 import { ruleBasedDecompose } from "@/lib/domain/decompose";
 import { completionRate, focusMs, formatRate, habitRate, habitStreakInfo, startRate } from "@/lib/domain/kpi";
+import { OPEN_STATUSES, goalHealth, goalPath } from "@/lib/domain/goals";
 import { pickFrog, rankTasks } from "@/lib/domain/priority";
+import { REVIEW_LABEL, dueReviews } from "@/lib/domain/reviews";
 import { TASK_STATUS_LABEL } from "@/lib/domain/types";
 import { formatDuration, startOfWeek } from "@/lib/domain/util";
 import { levelInfo, levelTitle, totalXp } from "@/lib/domain/xp";
@@ -34,6 +36,10 @@ export default function Home() {
   const week = { from: startOfWeek(now), to: new Date(startOfWeek(now).getTime() + 7 * 86400000) };
   const xp = totalXp(s.xpLogs);
   const lv = levelInfo(xp);
+  const topGoal = top?.goalId ? s.goals.find((g) => g.id === top.goalId) : undefined;
+  const topMilestone = top?.milestoneId ? s.milestones.find((m) => m.id === top.milestoneId) : undefined;
+  const reviewsDue = s.goals.length > 0 ? dueReviews(s, now).filter((k) => k !== "daily") : [];
+  const behindGoals = s.goals.filter((g) => OPEN_STATUSES.includes(g.status) && ["behind", "overdue"].includes(goalHealth(s, g.id, now)));
   const habits = s.habits.filter((h) => !h.archived && (h.weekdays.length === 0 || h.weekdays.includes(now.getDay())));
 
   const go = () => {
@@ -88,6 +94,15 @@ export default function Home() {
               <Badge>{TASK_STATUS_LABEL[top.status]}</Badge>
             </div>
             <h2 className="mt-2 text-xl font-semibold">{top.title}</h2>
+            {topGoal && (
+              <p className="mt-1 text-sm text-zinc-500">
+                ◎ 目標：
+                <Link href={`/goals/detail?id=${topGoal.id}`} className="text-emerald-700 hover:underline dark:text-emerald-400">
+                  {goalPath(s, topGoal.id).map((g) => g.title).join(" › ")}
+                </Link>
+                {topMilestone && ` ・ ${topMilestone.title}`}
+              </p>
+            )}
             <p className="mt-2 text-sm text-zinc-500">最初の30秒でやること</p>
             <p className="text-lg font-medium">{top.nextAction || top.firstAction || "必要なものを1つ手元に出す"}</p>
             {top.goals.minimum && <p className="mt-1 text-sm text-zinc-500">最低目標：{top.goals.minimum}</p>}
@@ -126,6 +141,26 @@ export default function Home() {
         </form>
         <p className="mt-2 text-xs text-zinc-500">最初の行動と最低目標はルールベースで自動入力されます。タスク画面で編集できます。</p>
       </Card>
+
+      {(behindGoals.length > 0 || reviewsDue.length > 0) && (
+        <Card>
+          <SectionTitle aside={<Link href="/goals" className="text-xs text-emerald-700 dark:text-emerald-400">目標管理</Link>}>長期目標</SectionTitle>
+          <ul className="space-y-1 text-sm">
+            {behindGoals.slice(0, 3).map((g) => (
+              <li key={g.id}>
+                <Link href={`/goals/detail?id=${g.id}&tab=forecast`} className="hover:underline">
+                  「{g.title}」が計画より遅れています。原因（気持ち・計画・時間）を確認する →
+                </Link>
+              </li>
+            ))}
+            {reviewsDue.map((k) => (
+              <li key={k}>
+                <Link href="/goals/reviews" className="hover:underline">{REVIEW_LABEL[k]}レビューの時期です →</Link>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       {resumable.length > 0 && (
         <Card>

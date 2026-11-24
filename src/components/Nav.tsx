@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const ITEMS = [
   { href: "/", label: "ホーム", icon: "⌂" },
   { href: "/tasks", label: "タスク", icon: "☰" },
+  { href: "/goals", label: "目標・戦略", icon: "◎" },
   { href: "/focus", label: "集中", icon: "◉" },
   { href: "/habits", label: "習慣", icon: "✓" },
   { href: "/rules", label: "if-then", icon: "⇢" },
@@ -14,7 +15,7 @@ const ITEMS = [
   { href: "/settings", label: "設定", icon: "⚙" },
 ];
 
-const MOBILE = ["/", "/tasks", "/focus", "/habits", "/analytics"];
+const MOBILE = ["/", "/tasks", "/focus", "/goals", "/habits"];
 
 export function Nav() {
   const path = usePathname();
@@ -50,7 +51,7 @@ export function Nav() {
             {i.label}
           </Link>
         ))}
-        <Link href="/settings" className={`flex flex-col items-center py-2 text-[11px] ${active("/settings") || active("/rules") || active("/stuck") ? "text-emerald-600" : "text-zinc-500"}`}>
+        <Link href="/settings" className={`flex flex-col items-center py-2 text-[11px] ${active("/settings") || active("/rules") || active("/stuck") || active("/analytics") ? "text-emerald-600" : "text-zinc-500"}`}>
           <span aria-hidden className="text-base">⋯</span>
           その他
         </Link>
